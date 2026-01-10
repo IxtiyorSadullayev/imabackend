@@ -85,6 +85,11 @@ export class UsersController {
     return this.usersService.checkCondidate()
   }
 
+  @Get("getbirthdays")
+  getBirthdays(){
+    return this.getBirthdays()
+  }
+
   @Post()
   @UseInterceptors(FileInterceptor('photo', {
     storage: diskStorage({

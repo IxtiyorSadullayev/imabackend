@@ -245,4 +245,16 @@ export class UsersService {
     }
   }
 
+
+  async getBugunBirthday(){
+    try {
+      const bugun = new Date().toISOString().split("T")[0].slice(5,10)
+      const users = await this.userRepo.find()
+      const data = users.filter(user => user.birthday.toISOString().split("T")[0].slice(5,10) == bugun)
+      return data;
+    } catch (err) {
+      throw new HttpException("Tug'ilgan kunlarni olishda muammo mavjud.", HttpStatus.BAD_REQUEST);
+    }
+  }
+
 }
