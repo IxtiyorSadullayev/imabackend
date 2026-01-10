@@ -237,4 +237,12 @@ export class UsersService {
     }
   }
 
+  checkCondidate(){
+    try {
+      return "ok"
+    } catch (err) {
+      throw new HttpException("Tekshirishda hatolik bo'ldi", HttpStatus.BAD_REQUEST)
+    }
+  }
+
 }

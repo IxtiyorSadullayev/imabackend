@@ -78,6 +78,13 @@ export class UsersController {
     return this.usersService.login(loginDto)
   }
 
+  @ApiBearerAuth()
+  @UseGuards(AdminGuard)
+  @Get('getcheck')
+  getcheck(){
+    return this.usersService.checkCondidate()
+  }
+
   @Post()
   @UseInterceptors(FileInterceptor('photo', {
     storage: diskStorage({
@@ -122,5 +129,7 @@ export class UsersController {
   remove(@Param('id') id: string) {
     return this.usersService.remove(id);
   }
+
+  
 
 }
