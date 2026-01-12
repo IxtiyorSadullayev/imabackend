@@ -10,6 +10,9 @@ import { CreateClassNameDto } from './dto/create-classname.dto';
 import { LoginDto } from './dto/login.dto';
 import { JwtService } from '@nestjs/jwt';
 import { UpdateLoginAndPasswordDto } from './dto/updateLogin.dto';
+import { rm } from 'fs';
+import { Workbook } from 'exceljs'
+import { CreateUserByFileDto } from './dto/createUserByFile.dto';
 
 @Injectable()
 export class UsersService {
@@ -83,8 +86,8 @@ export class UsersService {
       const usertype = await this.userTypeRepo.findOne({ where: { id: createUserDto.userType } })
       const classname = await this.classNameRepo.findOne({ where: { id: createUserDto.className } })
       const newuser = this.userRepo.create({
-        login: createUserDto.login==""? "": createUserDto.login,
-        password: createUserDto.password==""? "": createUserDto.password,
+        login: createUserDto.login == "" ? "" : createUserDto.login,
+        password: createUserDto.password == "" ? "" : createUserDto.password,
         pas_seria: createUserDto.pas_seria,
         pas_number: createUserDto.pas_number,
         fullname: createUserDto.fullname,
@@ -125,7 +128,7 @@ export class UsersService {
     }
   }
 
-   async findOneUserAndUpdateLoginAndPassword(id: string, updateloginandpassworddto: UpdateLoginAndPasswordDto) {
+  async findOneUserAndUpdateLoginAndPassword(id: string, updateloginandpassworddto: UpdateLoginAndPasswordDto) {
     try {
       const user = await this.userRepo.findOne({ where: { id: id } })
       if (!user) {
@@ -170,7 +173,6 @@ export class UsersService {
 
   async getAllClassName() {
     try {
-      console.log('oldingi zapros ishlamoqda')
       return await this.classNameRepo.find()
     }
     catch (err) {
@@ -237,4 +239,75 @@ export class UsersService {
     }
   }
 
+
+  async createUserByFile(createUserByFileDto: CreateUserByFileDto, doc) {
+    try {
+      const workbook = new Workbook()
+      await workbook.xlsx.readFile(doc.path)
+      const sheet = workbook.getWorksheet(1)
+      const classname = await this.classNameRepo.findOne({ where: { id: createUserByFileDto.class_name } })
+      if (!classname) {
+        throw new HttpException("Kechirasiz ushbu fayldagi o'quvchilar qaysi sinfga mansubligi topilmadi ?", HttpStatus.BAD_REQUEST)
+      }
+      const usertype = await this.userTypeRepo.findOne({ where: { id: createUserByFileDto.user_type } })
+      if (!usertype) {
+        throw new HttpException("Kechirasiz ushbu fayldagi o'quvchilar qaysi user tipiga mansubligi topilmadi ?", HttpStatus.BAD_REQUEST)
+      }
+      sheet?.eachRow(async row => {
+        var sana = row.values[5];
+        var oy = parseInt(sana.split('.')[1]) >= 10 ? parseInt(sana.split('.')[1]) : '0' + parseInt(sana.split('.')[1])
+        var kun = parseInt(sana.split('.')[0]) >= 10 ? parseInt(sana.split('.')[0]) : '0' + parseInt(sana.split('.')[0])
+        var d = `${parseInt(sana.split(".")[2])}-${oy}-${kun}`
+        var user = {
+          fullname: row.values[3],
+          className: classname,
+          birthday: d,
+          userType: usertype,
+          jinsi: row.values[4],
+          pas_seria: row.values[1],
+          pas_number: row.values[2]
+        }
+        // console.log(user)
+        const newuser = this.userRepo.create(user)
+        await this.userRepo.save(newuser)
+      })
+      rm(doc.path, () => { })
+      return "Barcha ma'lumotlar saqlandi."
+    }
+    catch (err) {
+      throw new HttpException("Ma'lumotlar bilan ishlashda hatolik bo'ldi" + err, HttpStatus.BAD_REQUEST)
+    }
+  }
+
+  async bugun() {
+    try {
+      const students = await this.userRepo.find({ relations: { userType: true }, where: { userType: { role: "Student" } } })
+      const teachers = await this.userRepo.find({ relations: { userType: true }, where: { userType: { role: "Teacher" } } })
+      const bugun = new Date().toISOString().split("T")[0].slice(5, 10)
+      var listStudents = students.filter(student => {
+        return student.birthday.toISOString().split("T")[0].slice(5, 10) == bugun
+      })
+      var listTeachers = teachers.filter(student => {
+        return student.birthday.toISOString().split("T")[0].slice(5, 10) == bugun
+      })
+      return {
+        students: listStudents,
+        teachers: listTeachers
+      }
+    }
+    catch (err) {
+      throw new HttpException("Tug'ilgan kunlarni olishda muammo mavjud." + err, HttpStatus.BAD_REQUEST)
+    }
+  }
+
+
+  async getByUserType(usertype: string) {
+    try {
+      const users = await this.userRepo.find({ relations: { userType: true, className: true }, where: { userType: { id: usertype } } })
+      return users
+    }
+    catch (err) {
+      throw new HttpException("Ma'lumotni olishda muammo mavjud." + err, HttpStatus.BAD_REQUEST)
+    }
+  }
 }

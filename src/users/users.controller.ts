@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseInterceptors, UploadedFile, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseInterceptors, UploadedFile, UseGuards, Query } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { CreateUserTypeDto } from './dto/create-usertype.dto';
@@ -9,8 +9,9 @@ import { diskStorage } from 'multer';
 import { LoginDto } from './dto/login.dto';
 import { AdminGuard } from './admin.guard';
 import { UsersGuard } from './users.guard';
-import { ApiBearerAuth } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiBody, ApiConsumes } from '@nestjs/swagger';
 import { UpdateLoginAndPasswordDto } from './dto/updateLogin.dto';
+import { CreateUserByFileDto } from './dto/createUserByFile.dto';
 
 @Controller('users')
 export class UsersController {
@@ -78,6 +79,50 @@ export class UsersController {
     return this.usersService.login(loginDto)
   }
 
+  @Get('bugun')
+  getBuguntugilganlar() {
+    return this.usersService.bugun()
+  }
+
+  @ApiBearerAuth()
+  @UseGuards(AdminGuard)
+  @Get('getbyUserType')
+  getByUserType(@Query('usertype_id') usertype_id: string) {
+    return this.usersService.getByUserType(usertype_id)
+  }
+
+  @ApiBearerAuth()
+  @UseGuards(AdminGuard)
+  @Post('byfilexlsx')
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        class_name: { type: 'string' },
+        user_type: { type: 'string' },
+        xls: {
+          type: 'string',
+          format: 'binary'
+        }
+      }
+    }
+  })
+  @UseInterceptors(FileInterceptor('xls', {
+    storage: diskStorage({
+      destination: "./xls",
+      filename: (req, file, callback) => {
+        const name = file.originalname.split('.')[0];
+        const fileExtname = extname(file.originalname);
+        const randomName = `${name}-${Date.now()}${fileExtname}`;
+        callback(null, randomName);
+      },
+    })
+  }))
+  createUserByFile(@Body() createUserByFileDto: CreateUserByFileDto, @UploadedFile() xls: Express.Multer.File) {
+    return this.usersService.createUserByFile(createUserByFileDto, xls)
+  }
+
   @Post()
   @UseInterceptors(FileInterceptor('photo', {
     storage: diskStorage({
@@ -112,7 +157,7 @@ export class UsersController {
   @ApiBearerAuth()
   @UseGuards(UsersGuard)
   @Patch(':id')
-  findOneandupdateloginpassword(@Param('id') id: string, @Body()updateloginandpassworddto: UpdateLoginAndPasswordDto) {
+  findOneandupdateloginpassword(@Param('id') id: string, @Body() updateloginandpassworddto: UpdateLoginAndPasswordDto) {
     return this.usersService.findOneUserAndUpdateLoginAndPassword(id, updateloginandpassworddto);
   }
 
