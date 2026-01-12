@@ -79,6 +79,7 @@ export class UsersController {
     return this.usersService.login(loginDto)
   }
 
+<<<<<<< HEAD
   @Get('bugun')
   getBuguntugilganlar() {
     return this.usersService.bugun()
@@ -121,6 +122,18 @@ export class UsersController {
   }))
   createUserByFile(@Body() createUserByFileDto: CreateUserByFileDto, @UploadedFile() xls: Express.Multer.File) {
     return this.usersService.createUserByFile(createUserByFileDto, xls)
+=======
+  @ApiBearerAuth()
+  @UseGuards(AdminGuard)
+  @Get('getcheck')
+  getcheck(){
+    return this.usersService.checkCondidate()
+  }
+
+  @Get("getbirthdays")
+  getBirthdays(){
+    return this.getBirthdays()
+>>>>>>> 3e11fd6c7f609348ea51e7446bbd309019c9b848
   }
 
   @Post()
@@ -167,5 +180,7 @@ export class UsersController {
   remove(@Param('id') id: string) {
     return this.usersService.remove(id);
   }
+
+  
 
 }
