@@ -239,7 +239,6 @@ export class UsersService {
     }
   }
 
-<<<<<<< HEAD
 
   async createUserByFile(createUserByFileDto: CreateUserByFileDto, doc) {
     try {
@@ -298,18 +297,17 @@ export class UsersService {
     }
     catch (err) {
       throw new HttpException("Tug'ilgan kunlarni olishda muammo mavjud." + err, HttpStatus.BAD_REQUEST)
-=======
-  checkCondidate(){
+    }
+  }
+  checkCondidate() {
     try {
       return "ok"
     } catch (err) {
       throw new HttpException("Tekshirishda hatolik bo'ldi", HttpStatus.BAD_REQUEST)
->>>>>>> 3e11fd6c7f609348ea51e7446bbd309019c9b848
     }
   }
 
 
-<<<<<<< HEAD
   async getByUserType(usertype: string) {
     try {
       const users = await this.userRepo.find({ relations: { userType: true, className: true }, where: { userType: { id: usertype } } })
@@ -319,17 +317,15 @@ export class UsersService {
       throw new HttpException("Ma'lumotni olishda muammo mavjud." + err, HttpStatus.BAD_REQUEST)
     }
   }
-=======
-  async getBugunBirthday(){
+  async getBugunBirthday() {
     try {
-      const bugun = new Date().toISOString().split("T")[0].slice(5,10)
+      const bugun = new Date().toISOString().split("T")[0].slice(5, 10)
       const users = await this.userRepo.find()
-      const data = users.filter(user => user.birthday.toISOString().split("T")[0].slice(5,10) == bugun)
+      const data = users.filter(user => user.birthday.toISOString().split("T")[0].slice(5, 10) == bugun)
       return data;
     } catch (err) {
       throw new HttpException("Tug'ilgan kunlarni olishda muammo mavjud.", HttpStatus.BAD_REQUEST);
     }
   }
 
->>>>>>> 3e11fd6c7f609348ea51e7446bbd309019c9b848
 }
