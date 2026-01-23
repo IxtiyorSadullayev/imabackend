@@ -8,10 +8,10 @@ export class User {
     @PrimaryGeneratedColumn("uuid")
     id: string;
 
-    @Column()
+    @Column({default: ""})
     login: string;
 
-    @Column()
+    @Column({default: ""})
     password: string;
 
     @Column()
@@ -29,7 +29,7 @@ export class User {
     @Column()
     birthday: Date;
 
-    @Column()
+    @Column({default: ""})
     phoneNumber: string;
 
     @Column({default: ""})
