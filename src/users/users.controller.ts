@@ -87,7 +87,7 @@ export class UsersController {
 
   @Get("getbirthdays")
   getBirthdays(){
-    return this.getBirthdays()
+    return this.usersService.getBugunBirthday()
   }
 
   @Post()

@@ -4,7 +4,8 @@
 /build
 
 # db 
-# ima.db
+ima.db
+ima.db/
 test.js
 # Logs
 logs
