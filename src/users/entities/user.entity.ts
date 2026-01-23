@@ -1,6 +1,7 @@
-import { Column, CreateDateColumn, Entity, ManyToOne,  PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import { Column, CreateDateColumn, Entity, ManyToOne,  OneToMany,  PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 import { UserType } from "./usertype.entity";
 import { ClassName } from "./className.entity";
+import { Yuqlama } from "src/yuqlama/entities/yuqlama.entity";
 
 @Entity()
 export class User {
@@ -34,6 +35,9 @@ export class User {
 
     @Column({default: ""})
     imgUrl: string;
+
+    @OneToMany(() => Yuqlama, (yuqlama) => yuqlama.user)
+    yuqlamalar: Yuqlama[];
 
     @ManyToOne(()=> UserType, (usertype) => usertype.users)
     userType: UserType

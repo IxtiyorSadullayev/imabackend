@@ -4,6 +4,7 @@ import { UsersModule } from './users/users.module';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
 import { JwtModule } from '@nestjs/jwt';
+import { YuqlamaModule } from './yuqlama/yuqlama.module';
 
 @Module({
   imports: [
@@ -24,6 +25,7 @@ import { JwtModule } from '@nestjs/jwt';
       signOptions: {expiresIn: '2h'}
     }),
     UsersModule,
+    YuqlamaModule,
   ],
 })
 export class AppModule {}

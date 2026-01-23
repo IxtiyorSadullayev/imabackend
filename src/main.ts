@@ -9,10 +9,7 @@ async function bootstrap() {
     origin: [
       "http://localhost:5173",
       "http://localhost:3000",
-<<<<<<< HEAD
       "http://localhost:3002",
-=======
->>>>>>> 067b0f6ccd9dec45a6f293cc7a90da6a01396f38
       "http://localhost:3001",
     ],
     methods: ['GET', 'POST', 'PATCH', 'DELETE', 'OPTIONS'],
