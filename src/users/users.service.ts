@@ -107,8 +107,29 @@ export class UsersService {
 
   async findAll() {
     try {
-      const users = await this.userRepo.find({ relations: { className: true, userType: true } })
-      return users;
+      const users = await this.userRepo.find({select: {id: true, fullname: true, jinsi: true, userType: {role: true}, className: {classname: true}}, relations: {userType: true, className: true}})
+      const classess = await this.classNameRepo.find()
+
+      var data =[] 
+      classess.forEach(cl =>{
+        var sinf_users = []
+        users.forEach(user => {
+          if(cl.classname === user.className.classname){
+            sinf_users.push({
+              id: user.id,
+              fullname: user.fullname,
+              jinsi: user.jinsi,
+              usertype: user.userType.role
+            })
+          }
+        })
+        data.push({
+          classname: cl.classname,
+          users: sinf_users
+        })
+        sinf_users=[]
+      })
+      return data;
     }
     catch (err) {
       throw new HttpException("Barcha userlarni olishda muammo mavjud\n" + err, HttpStatus.BAD_REQUEST)

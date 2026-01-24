@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestjs/common';
 import { YuqlamaService } from './yuqlama.service';
 import { CreateYuqlamaDto } from './dto/create-yuqlama.dto';
 import { UpdateYuqlamaDto } from './dto/update-yuqlama.dto';
@@ -13,8 +13,8 @@ export class YuqlamaController {
   }
 
   @Get()
-  findAll() {
-    return this.yuqlamaService.findAll();
+  findAll(@Query('come') come: string) {
+    return this.yuqlamaService.findAll(come);
   }
 
   @Get(':id')
