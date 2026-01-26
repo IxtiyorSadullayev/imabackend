@@ -17,6 +17,11 @@ export class YuqlamaController {
     return this.yuqlamaService.findAll();
   }
 
+  @Post('user')
+  keldiuser(@Body() userid: string) {
+    return this.yuqlamaService.keldiuser(userid);
+  }
+
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.yuqlamaService.findOne(+id);

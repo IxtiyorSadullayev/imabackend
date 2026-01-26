@@ -182,7 +182,7 @@ export class UsersService {
 
   async getOneClassName(id: string) {
     try {
-      return await this.classNameRepo.findOne({ where: { id: id } })
+      return await this.classNameRepo.findOne({ where: { id: id }, relations: {users: true} })
     }
     catch (err) {
       throw new HttpException("ClassName ni olishda muammo mavjud\n" + err, HttpStatus.BAD_REQUEST)
