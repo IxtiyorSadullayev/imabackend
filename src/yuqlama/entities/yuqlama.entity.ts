@@ -11,7 +11,7 @@ export class Yuqlama {
     user: User;
 
     @Column()
-    come: Date;
+    come: String;
 
     @Column()
     createdAt: Date;

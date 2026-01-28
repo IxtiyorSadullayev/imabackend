@@ -18,7 +18,7 @@ export class YuqlamaController {
   }
 
   @Post('user')
-  keldiuser(@Body() userid: string) {
+  keldiuser(@Body() userid: CreateYuqlamaDto) {
     return this.yuqlamaService.keldiuser(userid);
   }
 
