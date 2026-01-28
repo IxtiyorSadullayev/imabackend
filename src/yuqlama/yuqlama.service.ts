@@ -2,8 +2,8 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { CreateYuqlamaDto } from './dto/create-yuqlama.dto';
 import { UpdateYuqlamaDto } from './dto/update-yuqlama.dto';
 import { UsersService } from 'src/users/users.service';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { InjectRepository,  } from '@nestjs/typeorm';
+import { Repository, Like } from 'typeorm';
 import { Yuqlama } from './entities/yuqlama.entity';
 
 @Injectable()
@@ -14,25 +14,11 @@ export class YuqlamaService {
   ){}
 
 
-  create(createYuqlamaDto: CreateYuqlamaDto) {
-    return 'This action adds a new yuqlama';
-  }
 
   async findAll() {
     return await this.yuqlamaRepo.find()
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} yuqlama`;
-  }
-
-  update(id: number, updateYuqlamaDto: UpdateYuqlamaDto) {
-    return `This action updates a #${id} yuqlama`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} yuqlama`;
-  }
   async keldiuser(userid: CreateYuqlamaDto){
     try{
       const user = await this.userService.findOneUser(userid.userid)
@@ -60,4 +46,28 @@ export class YuqlamaService {
       throw new HttpException("Serverda hatolik mavjud, "+err , HttpStatus.BAD_REQUEST)
     }
   }
+
+  async findSana(sana: string){
+    try {
+      // bu yerga sanani quyidagi formatda berishi kerak bo'ladi
+      // 2026-01-28
+      const yuqlamalar = await this.yuqlamaRepo.createQueryBuilder("yuqlama")
+        .where("yuqlama.createdAt like :sana",{sana: `%${sana}%`})
+        .select([
+          "yuqlama.id",
+          "yuqlama.come",
+          "yuqlama.createdAt",
+          "user.fullname",
+          "className.classname"
+        ])
+        .leftJoin("yuqlama.user", "user")
+        .leftJoin("user.className", "className")
+        .getMany()
+      return yuqlamalar;
+    } catch (err) {
+      throw new HttpException("Serverda hatolik mavjud: "+err, HttpStatus.BAD_REQUEST);
+    }
+  }
+
+
 }
