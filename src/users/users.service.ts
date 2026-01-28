@@ -249,7 +249,7 @@ export class UsersService {
       if (user.password != loginDto.password) {
         throw new HttpException("Foydalanuvchi ma'lumoti noto'g'ri", HttpStatus.BAD_REQUEST)
       }
-      const payload = { user_id: user.id }
+      const payload = { user_id: user.id, role: user.userType.role };
       return {
         status: 200,
         message: "Yo'naltirilmoqda",
@@ -382,5 +382,23 @@ export class UsersService {
     } catch (err) {
       throw new HttpException("Foydalanuvchining rasmini yangilashda muammo mavjud\n" + err, HttpStatus.BAD_REQUEST)
     }
+  }
+
+  async setloginandpassword(){  
+    try {
+      const users = await this.userRepo.find()
+      let i=1;
+      for(const user of users){
+        if(user.login === "" || user.password === ""){
+          user.login = 'user'+ i
+          user.password = 'user'+ i
+          i++;
+          await this.userRepo.save(user)
+        }
+      }
+      return "Barcha foydalanuvchilarning login va paroli muvaffaqiyatli o'rnatildi."
+    } catch (err) {
+      throw new HttpException("Foydalanuvchilarning login va parolini o'rnatishda muammo mavjud\n" + err, HttpStatus.BAD_REQUEST)
+    } 
   }
 }

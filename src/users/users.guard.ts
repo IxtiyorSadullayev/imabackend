@@ -15,6 +15,9 @@ export class UsersGuard implements CanActivate {
     try {
       const payload = await this.jwtService.verifyAsync(token);
       request['user'] = payload;
+      if (payload.role === 'Student') {
+        throw new UnauthorizedException("Autentifikatsiya muvoffaqqiyatli emas. Siz user emassiz.");
+      }
     } catch {
       throw new UnauthorizedException("Autentifikatsiya muvoffaqqiyatli emas. Siz user emassiz.");
     }

@@ -147,6 +147,13 @@ export class UsersController {
 
   @ApiBearerAuth()
   @UseGuards(UsersGuard)
+  @Patch('setloginpassword')
+  setLoginAndPassword() {
+    return this.usersService.setloginandpassword();
+  }
+
+  @ApiBearerAuth()
+  @UseGuards(UsersGuard)
   @Patch('userphoto/:id')
   @ApiConsumes('multipart/form-data')
   @ApiBody({
