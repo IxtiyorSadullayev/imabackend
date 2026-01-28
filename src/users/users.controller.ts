@@ -12,6 +12,7 @@ import { UsersGuard } from './users.guard';
 import { ApiBearerAuth, ApiBody, ApiConsumes } from '@nestjs/swagger';
 import { UpdateLoginAndPasswordDto } from './dto/updateLogin.dto';
 import { CreateUserByFileDto } from './dto/createUserByFile.dto';
+import { UpdateUserClassnameDto } from './dto/updateClassName.dto';
 
 @Controller('users')
 export class UsersController {
@@ -132,6 +133,46 @@ export class UsersController {
   @Get("getbirthdays")
   getBirthdays(){
     return this.usersService.getBugunBirthday()
+  }
+
+
+  // update user classname
+  @ApiBearerAuth()
+  @UseGuards(UsersGuard)
+  @Patch('userclassname/:id')
+  updateUserClassname(@Param('id') id: string, @Body() updateUserClassnameDto: UpdateUserClassnameDto) {
+    return this.usersService.updateClassNameUser(id, updateUserClassnameDto);
+  }
+
+
+  @ApiBearerAuth()
+  @UseGuards(UsersGuard)
+  @Patch('userphoto/:id')
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        photo: {
+          type: 'string',
+          format: 'binary'
+        }
+      }
+    }
+  })
+  @UseInterceptors(FileInterceptor('photo', {
+    storage: diskStorage({
+      destination: "./uploads",
+      filename: (req, file, callback) => {
+        const name = file.originalname.split('.')[0];
+        const fileExtname = extname(file.originalname);
+        const randomName = `${name}-${Date.now()}${fileExtname}`;
+        callback(null, randomName);
+      },
+    })
+  }))
+  updateUserPhoto(@Param('id') id: string, @UploadedFile() photo: Express.Multer.File) {
+    return this.usersService.updateUserPhoto(id, photo);
   }
 
   @Post()

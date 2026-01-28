@@ -13,6 +13,7 @@ import { UpdateLoginAndPasswordDto } from './dto/updateLogin.dto';
 import { rm } from 'fs';
 import { Workbook } from 'exceljs'
 import { CreateUserByFileDto } from './dto/createUserByFile.dto';
+import { UpdateUserClassnameDto } from './dto/updateClassName.dto';
 
 @Injectable()
 export class UsersService {
@@ -349,4 +350,37 @@ export class UsersService {
     }
   }
 
+  async updateClassNameUser(id: string, updateUserClassnameDto: UpdateUserClassnameDto) {
+    try {
+      const user = await this.userRepo.findOne({ where: { id: id } })
+      if (!user) {
+        throw new HttpException("Kechirasiz foydalanuvchi topilmadi !", HttpStatus.NOT_FOUND)
+      } 
+      const classname = await this.classNameRepo.findOne({ where: { id: updateUserClassnameDto.classname_id } })
+      if(!classname){
+        throw new HttpException("Kechirasiz ushbu classname topilmadi !", HttpStatus.NOT_FOUND)
+      } 
+      user.className = classname
+      await this.userRepo.save(user)
+      return "Foydalanuvchining sinfi muvaffaqiyatli yangilandi."
+    } catch (err) {
+      throw new HttpException("Foydalanuvchining sinfini yangilashda muammo mavjud\n" + err, HttpStatus.BAD_REQUEST)
+    }
+  }
+
+  async updateUserPhoto(id:string, photo: Express.Multer.File){
+    try {
+      const user = await this.userRepo.findOne({ where: { id: id } })
+      if (!user) {
+        rm(photo.path, () => { })
+        throw new HttpException("Kechirasiz foydalanuvchi topilmadi !", HttpStatus.NOT_FOUND)
+      }
+      rm(user.imgUrl, ()=>{})
+      user.imgUrl = photo.path
+      await this.userRepo.save(user)
+      return "Foydalanuvchining rasmi muvaffaqiyatli yangilandi."
+    } catch (err) {
+      throw new HttpException("Foydalanuvchining rasmini yangilashda muammo mavjud\n" + err, HttpStatus.BAD_REQUEST)
+    }
+  }
 }

@@ -12,6 +12,11 @@ export class YuqlamaController {
     return this.yuqlamaService.findSana(sana)
   }
 
+  @Get('bugun')
+  findAllBugun() {
+    return this.yuqlamaService.findAllBugun();
+  }
+
   @Get()
   findAll() {
     return this.yuqlamaService.findAll();

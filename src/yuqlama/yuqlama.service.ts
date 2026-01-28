@@ -1,8 +1,7 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { CreateYuqlamaDto } from './dto/create-yuqlama.dto';
-import { UpdateYuqlamaDto } from './dto/update-yuqlama.dto';
 import { UsersService } from 'src/users/users.service';
-import { InjectRepository,  } from '@nestjs/typeorm';
+import { InjectRepository, } from '@nestjs/typeorm';
 import { Repository, Like } from 'typeorm';
 import { Yuqlama } from './entities/yuqlama.entity';
 
@@ -11,7 +10,7 @@ export class YuqlamaService {
   constructor(
     private userService: UsersService,
     @InjectRepository(Yuqlama) private yuqlamaRepo: Repository<Yuqlama>
-  ){}
+  ) { }
 
 
 
@@ -19,19 +18,19 @@ export class YuqlamaService {
     return await this.yuqlamaRepo.find()
   }
 
-  async keldiuser(userid: CreateYuqlamaDto){
-    try{
+  async keldiuser(userid: CreateYuqlamaDto) {
+    try {
       const user = await this.userService.findOneUser(userid.userid)
-      if(!user) {
+      if (!user) {
         throw new HttpException("Foydalanuvchi topilmadi", HttpStatus.NOT_FOUND);
       }
       const yuqlamabugun = await this.yuqlamaRepo.find({
         where: {
-          user: { id: user.id }, 
+          user: { id: user.id },
         }
       });
       console.log(new Date().toISOString().split("T")[0]);
-      if(yuqlamabugun.filter(y => y.createdAt.toISOString().split("T")[0] === new Date().toISOString().split("T")[0]).length > 0 ) {
+      if (yuqlamabugun.filter(y => y.createdAt.toISOString().split("T")[0] === new Date().toISOString().split("T")[0]).length > 0) {
         throw new HttpException("Foydalanuvchi bugun keldi", HttpStatus.BAD_REQUEST);
       }
       const yuqlama = new Yuqlama();
@@ -42,17 +41,17 @@ export class YuqlamaService {
       await this.yuqlamaRepo.save(yuqlama);
       return user;
     }
-    catch(err) {
-      throw new HttpException("Serverda hatolik mavjud, "+err , HttpStatus.BAD_REQUEST)
+    catch (err) {
+      throw new HttpException("Serverda hatolik mavjud, " + err, HttpStatus.BAD_REQUEST)
     }
   }
 
-  async findSana(sana: string){
+  async findSana(sana: string) {
     try {
       // bu yerga sanani quyidagi formatda berishi kerak bo'ladi
       // 2026-01-28
       const yuqlamalar = await this.yuqlamaRepo.createQueryBuilder("yuqlama")
-        .where("yuqlama.createdAt like :sana",{sana: `%${sana}%`})
+        .where("yuqlama.createdAt like :sana", { sana: `%${sana}%` })
         .select([
           "yuqlama.id",
           "yuqlama.come",
@@ -65,9 +64,29 @@ export class YuqlamaService {
         .getMany()
       return yuqlamalar;
     } catch (err) {
-      throw new HttpException("Serverda hatolik mavjud: "+err, HttpStatus.BAD_REQUEST);
+      throw new HttpException("Serverda hatolik mavjud: " + err, HttpStatus.BAD_REQUEST);
     }
   }
 
+  async findAllBugun() {
+    try {
+      const today = new Date().toISOString().split("T")[0];
+      const yuqlamalar = await this.yuqlamaRepo.createQueryBuilder("yuqlama")
+        .where("yuqlama.createdAt like :today", { today: `%${today}%` })
+        .select([
+          "yuqlama.id",
+          "yuqlama.come",
+          "yuqlama.createdAt",
+          "user.fullname",
+          "className.classname"
+        ])
+        .leftJoin("yuqlama.user", "user")
+        .leftJoin("user.className", "className")
+        .getMany()
+      return yuqlamalar;
+    } catch (err) {
+      throw new HttpException("Serverda hatolik mavjud: " + err, HttpStatus.BAD_REQUEST);
+    }
+  }
 
 }
