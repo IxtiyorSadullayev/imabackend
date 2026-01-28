@@ -1,5 +1,5 @@
 import { User } from "src/users/entities/user.entity";
-import { Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity()
 export class Yuqlama {
@@ -13,9 +13,9 @@ export class Yuqlama {
     @Column()
     come: String;
 
-    @CreateDateColumn()
+    @Column()
     createdAt: Date;
 
-    @UpdateDateColumn()
+    @Column()
     updatedAt: Date;
 }
