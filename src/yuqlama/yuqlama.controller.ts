@@ -16,6 +16,15 @@ export class YuqlamaController {
     return this.yuqlamaService.findSana(sana)
   }
 
+  @ApiBearerAuth()
+  @UseGuards(UsersGuard)
+  @Get('kelmaganlar')
+  findbydateKelmaganlar(@Query('sana') sana: string) {
+    // sana bo'yicha ma'lumotlarni qidirib topish
+    return this.yuqlamaService.findSanaKelmaganlar(sana)
+  }
+
+
   @Get('bugun')
   findAllBugun() {
     return this.yuqlamaService.findAllBugun();

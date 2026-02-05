@@ -163,6 +163,31 @@ export class UsersService {
     }
   }
 
+  async findAllUserKelmaganlar(sana: string){
+    try {
+      const kelmaganUsers = await this.userRepo
+        .createQueryBuilder("user")
+        .leftJoin(
+          "user.yuqlamalar",
+          "yuqlama",
+          "yuqlama.createdAt LIKE :sana",
+          { sana: `%${sana}%` }
+        )
+        .where("yuqlama.id IS NULL")
+        .select([
+          "user.id",
+          "user.fullname",
+          "className.classname"
+        ])
+        .leftJoin("user.className", "className")
+        .getMany();
+      
+      return kelmaganUsers;
+    } catch (err) {
+      throw new HttpException("Barcha userlarni olishda muammo mavjud\n" + err, HttpStatus.BAD_REQUEST)
+    }
+  }
+
   async findOneUser(id: string) {
     try {
       const user = await this.userRepo.findOne({ where: { id: id } })
