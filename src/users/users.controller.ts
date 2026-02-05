@@ -35,6 +35,20 @@ export class UsersController {
 
   @ApiBearerAuth()
   @UseGuards(AdminGuard)
+  @Get('type/:id')
+  getOneUsertype(@Param("id") id:string) {
+    return this.usersService.findOneusertype(id);
+  }
+
+  @ApiBearerAuth()
+  @UseGuards(AdminGuard)
+  @Patch('type/:id')
+  updateusertype(@Param('id') id: string, @Body() updateDto: CreateUserTypeDto) {
+    return this.usersService.updateUser(id, updateDto);
+  }
+
+  @ApiBearerAuth()
+  @UseGuards(AdminGuard)
   @Delete('type/:id')
   deleteusertype(@Param('id') id: string) {
     return this.usersService.delusertype(id);

@@ -15,7 +15,7 @@ export class YuqlamaService {
 
 
   async findAll() {
-    return await this.yuqlamaRepo.find()
+    return await this.yuqlamaRepo.find({relations: {user: {className: true}}})
   }
 
   async keldiuser(userid: CreateYuqlamaDto) {

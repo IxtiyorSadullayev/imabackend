@@ -63,6 +63,32 @@ export class UsersService {
     }
   }
 
+  async findOneusertype(id: string){
+    try {
+      const usertypes = await this.userTypeRepo.findOne({where: {id: id}})
+      if (!usertypes){
+        throw new HttpException("Kechirasiz ma'lumot topilmadi", HttpStatus.NOT_FOUND);
+      }
+      return usertypes
+    }
+    catch (err) {
+      throw new HttpException("Usertypeni olishda muammo mavjud\n" + err, HttpStatus.BAD_REQUEST)
+    }
+  }
+
+  async updateUser(id: string, updateDto: CreateUserTypeDto){
+    try {
+      const usertype = await this.userTypeRepo.findOne({ where: { id: id } })
+      if (!usertype) {
+        throw new HttpException("Kechirasiz ushbu user turi mavjud emas!", HttpStatus.NOT_FOUND);
+      }
+      await this.userTypeRepo.update(id, updateDto)
+      return "Ma'lumot yangilandi"
+    }
+    catch (err) {
+      throw new HttpException("usertype ni o'chirishda muammo mavjud\n" + err, HttpStatus.BAD_REQUEST)
+    }
+  }
   async delusertype(id: string) {
     try {
       const usertype = await this.userTypeRepo.findOne({ where: { id: id } })
@@ -242,7 +268,7 @@ export class UsersService {
 
   async login(loginDto: LoginDto) {
     try {
-      const user = await this.userRepo.findOne({ where: { login: loginDto.login } })
+      const user = await this.userRepo.findOne({ where: { login: loginDto.login }, relations: {userType: true} })
       if (!user) {
         throw new HttpException("Foydalanuvchi topilmadi", HttpStatus.NOT_FOUND)
       }
