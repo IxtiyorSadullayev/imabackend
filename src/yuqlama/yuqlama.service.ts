@@ -10,12 +10,12 @@ export class YuqlamaService {
   constructor(
     private userService: UsersService,
     @InjectRepository(Yuqlama) private yuqlamaRepo: Repository<Yuqlama>
-  ) { }
+    ) { }
 
 
 
   async findAll() {
-    return await this.yuqlamaRepo.find({relations: {user: {className: true}}})
+    return await this.yuqlamaRepo.find({ relations: { user: { className: true } } })
   }
 
   async keldiuser(userid: CreateYuqlamaDto) {
@@ -64,6 +64,16 @@ export class YuqlamaService {
         .getMany()
       return yuqlamalar;
     } catch (err) {
+      throw new HttpException("Serverda hatolik mavjud: " + err, HttpStatus.BAD_REQUEST);
+    }
+  }
+
+  async findSanaKelmaganlar(sana: string) {
+    try {
+      const kelmaganUsers = await this.userService.findAllUserKelmaganlar(sana)
+      return kelmaganUsers;
+    }
+    catch (err) {
       throw new HttpException("Serverda hatolik mavjud: " + err, HttpStatus.BAD_REQUEST);
     }
   }
