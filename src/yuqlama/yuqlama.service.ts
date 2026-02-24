@@ -89,4 +89,14 @@ export class YuqlamaService {
     }
   }
 
+  async findSanaKelmaganlar(sana: string) {
+    try {
+      const kelmaganUsers = await this.userService.findAllUserKelmaganlar(sana)
+      return kelmaganUsers;
+    }
+    catch (err) {
+      throw new HttpException("Serverda hatolik mavjud: " + err, HttpStatus.BAD_REQUEST);
+    }
+  }
+
 }
